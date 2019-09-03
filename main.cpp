@@ -92,6 +92,7 @@ int main() {
   auto const compare_words = [](const count_pair_t &x, const count_pair_t &y) {
     return x.second.compare(y.second) < 0;
   };
+  auto const found_pred = [](const count_pair_t &arg1, const count_pair_t &arg2) { return arg1.first == arg2.first; };
 
 
 
@@ -114,16 +115,15 @@ int main() {
 
   const auto just_counts_rng = adaptors::reverse(make_iterator_range(just_counts.begin(), just_counts.end()));
 
-  std::array<count_pair_t, 1> the_search_item = { std::make_pair(0, std::string{}) };
+  std::array<count_pair_t, 1> the_search_item{ count_pair_t{0, std::string{}} };
   auto current = count_pairs.begin();
   const auto very_end = count_pairs.end();
-  auto const found_pred = [](const count_pair_t &arg1, const count_pair_t &arg2) { return arg1.first == arg2.first; };
   int check_count = 0, sub_rng_count = 0;
   for(const unsigned int n : just_counts_rng) {
     check_count++;
     the_search_item[0].first = n;
     current = std::find_first_of(current, very_end, the_search_item.begin(), the_search_item.end(), found_pred);
-    if(current != very_end) {
+    if (current != very_end) {
       const auto sub_rng_end = std::find_end(current, very_end, the_search_item.begin(), the_search_item.end(), found_pred);
       const auto sub_rng = make_iterator_range(current, sub_rng_end != very_end ? sub_rng_end + 1 : sub_rng_end);
       sort(sub_rng, compare_words);
@@ -131,20 +131,20 @@ int main() {
         current = sub_rng_end;
       }
       sub_rng_count++;
+    } else {
+      break;
     }
-    if (current == very_end) break;
   }
 
 
 
-  fputs("DEBUG: ", stderr);
+  fputs("\nDEBUG: ", stderr);
   for(const unsigned int n : just_counts_rng) {
     fprintf(stderr, "%d, ", n);
   }
   putc('\n', stderr);
-  putc('\n', stderr);
 
-  fprintf(stderr, "DEBUG: set count: %d, check count: %d, sub range count: %d\n\n",
+  fprintf(stderr, "\nDEBUG: set count: %d, check count: %d, sub range count: %d\n\n",
           just_counts.size(), check_count, sub_rng_count);
 
 

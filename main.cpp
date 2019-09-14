@@ -1,11 +1,9 @@
-#include <boost/type.hpp>
 #include <boost/range/istream_range.hpp>
 #include <boost/range/adaptors.hpp>
 #include <boost/range/algorithm.hpp>
 #include <boost/range/algorithm_ext.hpp>
 #include <iostream>
 #include <unordered_map>
-#include <cstdlib>
 
 using namespace boost;
 using namespace boost::adaptors;
@@ -36,10 +34,11 @@ public:
   using value_type = T;
   using const_iterator = CIter;
   using iterator = Iter;
-  collection_append(C &a_collection) : collection(a_collection) {}
+  explicit collection_append(C &a_collection) : collection(a_collection) {}
   collection_append() = delete;
   collection_append(const collection_append&) = delete;
   collection_append(collection_append&&) = delete;
+  ~collection_append() = default;
   collection_append&operator =(const collection_append&) = delete;
   collection_append&operator =(collection_append&&) = delete;
 
@@ -53,11 +52,11 @@ public:
     this->collection.insert(__position, __first, __last);
   }
 
-  constexpr inline iterator begin() noexcept {
+  constexpr inline iterator begin() const noexcept {
     return this->collection.begin();
   }
 
-  constexpr inline iterator end() noexcept {
+  constexpr inline iterator end() const noexcept {
     return this->collection.end();
   }
 };
@@ -73,7 +72,7 @@ void print_collection(const C& collection) {
 int main() {
   auto const is_alpha_word = [](const std::string &word) {
     for(const char c : word) {
-      if (!std::isalpha(c)) return false;
+      if (std::isalpha(c) == 0) { return false; }
     }
     return true;
   };
@@ -144,7 +143,7 @@ int main() {
   }
   putc('\n', stderr);
 
-  fprintf(stderr, "\nDEBUG: set count: %d, check count: %d, sub range count: %d\n\n",
+  fprintf(stderr, "\nDEBUG: set count: %lu, check count: %d, sub range count: %d\n\n",
           just_counts.size(), check_count, sub_rng_count);
 
 
